@@ -35,6 +35,11 @@ module.exports = (sequelize) => {
         defaultValue: "pendiente",
       },
 
+      paid: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

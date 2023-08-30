@@ -56,6 +56,7 @@ const postOrder = async (req, res) => {
       delivery_date,
       delivery_method,
       status,
+      paid,
     } = req.body;
 
     if (
@@ -64,7 +65,8 @@ const postOrder = async (req, res) => {
       !delivery_date ||
       !delivery_method ||
       !status ||
-      !client_id
+      !client_id ||
+      !paid
     ) {
       return res.status(400).json({ message: "Falta información" });
     }
@@ -92,9 +94,6 @@ const postOrder = async (req, res) => {
     //       });
     //   }
     // }
-
-    console.log(products);
-    console.log(typeof products);
     
     const newOrder = await Order.create({
       date,
@@ -102,6 +101,7 @@ const postOrder = async (req, res) => {
       delivery_method,
       status,
       products,
+      paid
     });
 
     await newOrder.setClient(client);
@@ -114,7 +114,7 @@ const postOrder = async (req, res) => {
 
 const putOrder = async (req, res) => {
   try {
-    const { order_id, products, delivery_date, delivery_method, status } =
+    const { order_id, products, delivery_date, delivery_method, status, paid } =
       req.body;
 
     if (!order_id) {
@@ -134,15 +134,15 @@ const putOrder = async (req, res) => {
     }
 
     if (products) {
-      for (const item of products) {
-        const productAux = await Product.findByPk(item.product_id);
-        if (productAux.stock < item.quantity) {
-          return res.status(400).json({
-            message:
-              "La cantidad de velas pedidas es mayor al stock disponible",
-          });
-        }
-      }
+      // for (const item of products) {
+      //   const productAux = await Product.findByPk(item.product_id);
+      //   if (productAux.stock < item.quantity) {
+      //     return res.status(400).json({
+      //       message:
+      //         "La cantidad de velas pedidas es mayor al stock disponible",
+      //     });
+      //   }
+      // }
 
       existingOrder.update({ products });
     }
@@ -157,6 +157,10 @@ const putOrder = async (req, res) => {
 
     if (status) {
       existingOrder.update({ status });
+    }
+
+    if (paid) {
+      existingOrder.update({ paid });
     }
 
     return res
