@@ -26,7 +26,7 @@ const getExpenseById = async (req, res) => {
             return res.status(400).json({message: "El id es inválido"});
         }
 
-        const expenseById = await Expense.finByPk(id);
+        const expenseById = await Expense.findByPk(id);
 
         if(!expenseById) {
             return res.status(400).json({message: `No se encontró un gasto con el id: ${id}`});
@@ -108,7 +108,7 @@ const getExpenseByName = async (req, res) => {
           await existingExpense.update({ name });
       }
   
-      if(cost) {
+      if(date) {
           await existingExpense.update({ date });
       }
 
