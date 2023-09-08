@@ -65,10 +65,10 @@ const getProductByName = async (req, res) => {
 const postProduct = async (req, res) => {
   console.log(req.body);
   try {
-    const { name, width, height, weight, stock, img, duration } =
+    const { name, width, height, weight, img, duration, earning_percentage } =
       req.body;
 
-    if (!name || !width || !height || !weight || !stock || !img) {
+    if (!name || !width || !height || !weight || !img || !earning_percentage) {
       return res.status(400).json({ message: "Falta información" });
     }
 
@@ -87,9 +87,9 @@ const postProduct = async (req, res) => {
       width,
       height,
       weight,
-      stock,
       img,
       duration,
+      earning_percentage,
     });
 
     return res
@@ -110,9 +110,9 @@ const putProduct = async (req, res) => {
       width,
       height,
       weight,
-      stock,
       img,
       duration,
+      earning_percentage,
     } = req.body;
 
     if (
@@ -121,8 +121,8 @@ const putProduct = async (req, res) => {
       !width ||
       !height ||
       !weight ||
-      !stock ||
-      !img
+      !img ||
+      !earning_percentage
     ) {
       return res.status(400).json({ message: "Falta información" });
     }
@@ -140,9 +140,9 @@ const putProduct = async (req, res) => {
       width,
       height,
       weight,
-      stock,
       img,
       duration,
+      earning_percentage
     });
 
     return res.status(200).json({ message: `${name} fue actualizado con éxito` });
