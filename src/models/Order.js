@@ -25,9 +25,19 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
 
+      total_amount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+
       delivery_method: {
         type: DataTypes.STRING,
         defaultValue: "Retiro",
+      },
+
+      discount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
 
       status: {

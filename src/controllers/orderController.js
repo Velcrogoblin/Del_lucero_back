@@ -1,4 +1,4 @@
-const { Client, Product, Order } = require("../db");
+const { Client, Product, Order, Supply } = require("../db");
 const regexUUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -57,6 +57,7 @@ const postOrder = async (req, res) => {
       delivery_method,
       status,
       paid,
+      discount
     } = req.body;
 
     if (
@@ -83,25 +84,23 @@ const postOrder = async (req, res) => {
         .json({ message: `No existe cliente con el id: ${client_id}` });
     }
 
-    // for (const item of products) {
-    //   const productAux = await Product.findByPk(item.product_id);
-    //   if (productAux.stock < item.quantity) {
-    //     return res
-    //       .status(400)
-    //       .json({
-    //         message:
-    //           "La cantidad de velas pedidas es mayor al stock disponible",
-    //       });
-    //   }
-    // }
-    
+
+    let totalPrice = products.reduce((accumulator, product) => {
+      return accumulator + (product.price * product.quantity);
+    }, 0);
+       
+    totalPrice = Math.round((totalPrice * (100 - discount)) / 100);
+
+
     const newOrder = await Order.create({
       date,
       delivery_date,
       delivery_method,
       status,
       products,
-      paid
+      paid,
+      discount,
+      total_amount: totalPrice
     });
 
     await newOrder.setClient(client);
@@ -114,7 +113,7 @@ const postOrder = async (req, res) => {
 
 const putOrder = async (req, res) => {
   try {
-    const { order_id, products, delivery_date, delivery_method, status, paid } =
+    const { order_id, products, delivery_date, delivery_method, status, paid, discount } =
       req.body;
 
     if (!order_id) {
@@ -133,35 +132,37 @@ const putOrder = async (req, res) => {
         .json({ message: `No existe pedido con id: ${order_id}` });
     }
 
-    if (products) {
-      // for (const item of products) {
-      //   const productAux = await Product.findByPk(item.product_id);
-      //   if (productAux.stock < item.quantity) {
-      //     return res.status(400).json({
-      //       message:
-      //         "La cantidad de velas pedidas es mayor al stock disponible",
-      //     });
-      //   }
-      // }
+    let totalPrice = products.reduce((accumulator, product) => {
+      return accumulator + (product.price * product.quantity);
+    }, 0);
+       
+    totalPrice = Math.round((totalPrice * (100 - discount)) / 100);
 
-      existingOrder.update({ products });
+    if (products) {
+      await existingOrder.update({ products });
     }
 
     if (delivery_date) {
-      existingOrder.update({ delivery_date });
+      await existingOrder.update({ delivery_date });
     }
 
     if (delivery_method) {
-      existingOrder.update({ delivery_method });
+      await existingOrder.update({ delivery_method });
     }
 
     if (status) {
-      existingOrder.update({ status });
+      await existingOrder.update({ status });
     }
 
     if (paid) {
-      existingOrder.update({ paid });
+      await existingOrder.update({ paid });
     }
+
+    if(discount) {
+      await existingOrder.update({ discount });
+    }
+
+    await existingOrder.update({total_amount: totalPrice });
 
     return res
       .status(200)

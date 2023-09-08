@@ -19,9 +19,9 @@ const getAllPurchases = async (req, res) => {
 
 const postPurchase = async (req,res) => {
     try {
-        const { client_id, products, date, total_amount } = req.body;
+        const { client_id, products, date } = req.body;
 
-        if( !products || !date || !total_amount || !client_id) {
+        if( !products || !date  || !client_id) {
             return res.status(400).json({message: "Falta información"});
         }
 
@@ -35,19 +35,17 @@ const postPurchase = async (req,res) => {
           return res.status(404).json({message: `No existe cliente con el id: ${client_id}`});
         }
 
+        const totalPrice = products.reduce((accumulator, product) => {
+            return accumulator + (product.price * product.quantity);
+          }, 0);
+
        const newPurchase = await Purchase.create ({
             date,
-            total_amount,
+            total_amount: totalPrice,
             products
         })
 
         await newPurchase.setClient(client);
-
-        // for (const item of products) { 
-        //     const product = await Product.findByPk(item.product_id);
-        //     const finalStock = product.stock - item.quantity
-        //     await product.update({stock: finalStock});
-        // };
 
         return res.status(201).json({message: "Tu venta fue creada con éxito!"});
     } catch (error) {

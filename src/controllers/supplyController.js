@@ -26,7 +26,7 @@ const getSupplyById = async (req, res) => {
             return res.status(400).json({message: "El id es inválido"});
         }
 
-        const supplyById = await Supply.finByPk(id);
+        const supplyById = await Supply.findByPk(id);
 
         if(!supplyById) {
             return res.status(400).json({message: `No se encontró un insumo con el id: ${id}`});

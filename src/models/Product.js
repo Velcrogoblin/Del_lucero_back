@@ -30,7 +30,7 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
 
-      stock: {
+      earning_percentage: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
