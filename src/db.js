@@ -40,6 +40,9 @@ Product.belongsToMany(Purchase, { through: "product_purchase" });
 Order.belongsToMany(Product, { through: "product_order" });
 Product.belongsToMany(Order, { through: "product_order" });
 
+Supply.belongsToMany(Product, {through: "product_supply"});
+Product.belongsToMany(Supply, {through: "product_supply"});
+
 Client.hasMany(Purchase, { foreignKey: "client_id" });
 Purchase.belongsTo(Client, { foreignKey: "client_id" });
 

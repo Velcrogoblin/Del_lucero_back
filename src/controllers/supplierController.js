@@ -108,7 +108,7 @@ const postSupplier = async (req, res) => {
 
 const putSupplier = async (req, res) => {
   try {
-    const { supplier_id, name, phone, address, website, supplies } = req.body;
+    const { supplier_id, name, phone, address, website, Supplies } = req.body;
 
     const existingSupplier = await Supplier.findByPk(supplier_id);
 
@@ -117,6 +117,8 @@ const putSupplier = async (req, res) => {
         .status(404)
         .json({ message: `No se encontraron proveedores con el id: ${id}` });
     }
+
+    const newSupplies = await Supply.findAll({where:{name: Supplies}});
 
     if(name) {
         existingSupplier.update({ name });
@@ -134,9 +136,10 @@ const putSupplier = async (req, res) => {
         existingSupplier.update({ website });
     }
 
-    if(supplies) {
-      existingSupplier.update({ supplies });
-  }
+    await existingSupplier.setSupplies([]);
+    await existingSupplier.addSupplies(newSupplies);
+
+
 
     return res.status(200).json({ message: `${name} fue actualizado con éxito` });
   } catch (error) {
