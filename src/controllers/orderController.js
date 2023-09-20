@@ -172,6 +172,44 @@ const putOrder = async (req, res) => {
   }
 };
 
+const deleteOrder =  async (req, res) => {
+  try {
+
+    console.log("llega 1");
+
+    const { order_id } = req.body;
+
+    if(!order_id) {
+      return res.status(400).json({ message: "No se envió un id"});
+    }
+
+    if (!regexUUID.test(order_id)) {
+      return res.status(400).json({ message: "El id de pedido no es válido" });
+    }
+
+    console.log("llega 2");
+
+    const order = await Order.findByPk(order_id);
+
+    if(!order) {
+     return  res.status(400).json({message: `No se encontró una orden con el id: ${order_id}`});
+    }
+
+    console.log("llega 3");
+
+    if (order.active === true) {
+      await order.update({active: false});
+    } else {
+      await order.update({active: true});
+    }
+
+    return res.status(200).json({message: `El pedido con id ${order_id} ha sido actualizado con éxito`});
+
+  } catch (error) {
+    return res.status(500).json({message: error.message});
+  }
+}
+
 const destroyOrder = async (req, res) => {
   try {
     const { order_id } = req.body;
@@ -181,7 +219,7 @@ const destroyOrder = async (req, res) => {
     }
 
     if (!regexUUID.test(order_id)) {
-      return res.status(400).json({ message: "El id de cliente no es válido" });
+      return res.status(400).json({ message: "El id de pedido no es válido" });
     }
 
     const order = await Order.findByPk(order_id);
@@ -204,5 +242,6 @@ module.exports = {
   getOrderById,
   postOrder,
   putOrder,
-  destroyOrder
+  destroyOrder,
+  deleteOrder
 };

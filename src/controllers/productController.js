@@ -1,8 +1,8 @@
-const { Product, Op } = require("../db");
+const { Product, Supply, Op } = require("../db");
 
 const getAllProducts = async (req, res) => {
   try {
-    let products = await Product.findAll();
+    let products = await Product.findAll({include: {model: Supply}});
 
     if (products.length === 0) {
       return res.status(404).json({ message: "No se encontraron productos" });
@@ -22,7 +22,7 @@ const getProductById = async (req, res) => {
       return res.status(400).json({ message: "No se envió un id" });
     }
 
-    let productById = await Product.findByPk(id);
+    let productById = await Product.findByPk(id, {include: {model: Supply}});
 
     if (!productById) {
       return res
@@ -50,7 +50,7 @@ const getProductByName = async (req, res) => {
           [Op.iLike]: "%" + name + "%",
         },
       },
-    });
+      include: {model: Supply}});
 
     if (!productsByName) {
       return res.status(400).json({ message: `${name} no fue encontrado` });
@@ -65,10 +65,10 @@ const getProductByName = async (req, res) => {
 const postProduct = async (req, res) => {
   console.log(req.body);
   try {
-    const { name, width, height, weight, img, duration, earning_percentage } =
+    const { name, width, height, weight, img, duration, earning_percentage, product_supplies } =
       req.body;
 
-    if (!name || !width || !height || !weight || !img || !earning_percentage) {
+    if (!name || !width || !height || !weight || !img || !earning_percentage || !product_supplies) {
       return res.status(400).json({ message: "Falta información" });
     }
 
@@ -82,7 +82,10 @@ const postProduct = async (req, res) => {
       return res.status(400).json({ message: `${name} ya existe` });
     }
 
-    await Product.create({
+    const existingSupplies = await Supply.findAll({where : {name: product_supplies}});
+
+
+    const newProduct = await Product.create({
       name,
       width,
       height,
@@ -91,6 +94,8 @@ const postProduct = async (req, res) => {
       duration,
       earning_percentage,
     });
+
+    await newProduct.addSupplies(existingSupplies);
 
     return res
       .status(201)
@@ -113,6 +118,7 @@ const putProduct = async (req, res) => {
       img,
       duration,
       earning_percentage,
+      Supplies
     } = req.body;
 
     if (
@@ -122,7 +128,8 @@ const putProduct = async (req, res) => {
       !height ||
       !weight ||
       !img ||
-      !earning_percentage
+      !earning_percentage ||
+      !Supplies
     ) {
       return res.status(400).json({ message: "Falta información" });
     }
@@ -135,6 +142,12 @@ const putProduct = async (req, res) => {
         .json({ message: `No se encontraron productos con el id: ${product_id}` });
     }
 
+    const newSupplies = await Supply.findAll({where: {name: Supplies}})
+
+    if(!newSupplies) {
+      return res.status(400).json({message: "No existen esos insumos"});
+    }
+
     existingProduct.update({
       name,
       width,
@@ -142,8 +155,13 @@ const putProduct = async (req, res) => {
       weight,
       img,
       duration,
-      earning_percentage
+      earning_percentage,
     });
+
+    await existingProduct.setSupplies([]);
+    await existingProduct.addSupplies(newSupplies);
+
+
 
     return res.status(200).json({ message: `${name} fue actualizado con éxito` });
   } catch (error) {
