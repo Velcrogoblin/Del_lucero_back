@@ -17,8 +17,8 @@ router
   .get("/", getAllClients)
   .get("/id/:id", getClientById)
   .get("/name/", getClientByName)
-  .post("/", postClient)
-  .put("/edit/", putClient)
-  .put("/delete/:id", deleteClient);
+  .post("/", verifyToken, postClient)
+  .put("/edit/", verifyToken, putClient)
+  .put("/delete/:id", verifyToken, deleteClient);
 
 module.exports = router;

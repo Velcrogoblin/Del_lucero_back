@@ -8,7 +8,7 @@ const {
   putProduct,
   deleteProduct,
 } = require("../controllers/productController");
-//const { verifyToken } = require("../controllers/authController");
+const { verifyToken } = require("../controllers/authController");
 
 const router = Router();
 
@@ -16,8 +16,8 @@ router
   .get("/", getAllProducts)
   .get("/id/:id", getProductById)
   .get("/name/", getProductByName)
-  .post("/", postProduct)
-  .put("/edit", putProduct)
-  .put("/delete/:id", deleteProduct);
+  .post("/", verifyToken, postProduct)
+  .put("/edit", verifyToken, putProduct)
+  .put("/delete/:id", verifyToken, deleteProduct);
 
 module.exports = router;
