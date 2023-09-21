@@ -17,8 +17,8 @@ router
   .get("/", getAllSuppliers)
   .get("/id/:id", getSupplierById)
   .get("/name/", getSupplierByName)
-  .post("/", postSupplier)
-  .put("/", putSupplier)
-  .put("/delete/:id", deleteSupplier);
+  .post("/", verifyToken, postSupplier)
+  .put("/", verifyToken, putSupplier)
+  .put("/delete/:id", verifyToken, deleteSupplier);
 
 module.exports = router;

@@ -7,7 +7,6 @@ const isAdmin = async (req, res, next) => {
     return res
       .status(500)
       .json({ message: "Falta ingresar datos de administrador" });
-  console.log(credentials);
 
   if (
     credentials.user === admin.user &&

@@ -17,8 +17,8 @@ router
   .get("/", getAllExpenses)
   .get("/id/:id", getExpenseById)
   .get("/name/", getExpenseByName)
-  .post("/", postExpense)
-  .put("/", putExpense)
-  .delete("/:id", deleteExpense);
+  .post("/", verifyToken, postExpense)
+  .put("/", verifyToken, putExpense)
+  .delete("/:id", verifyToken, deleteExpense);
 
 module.exports = router;
